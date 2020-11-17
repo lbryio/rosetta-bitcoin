@@ -18,7 +18,7 @@ executors:
     docker:
       - image: circleci/golang:1.13
         user: root # go directory is owned by root
-    working_directory: /go/src/github.com/coinbase/rosetta-bitcoin
+    working_directory: /go/src/github.com/lbryio/rosetta-lbry
     environment:
       - GO111MODULE: "on"
 
@@ -69,7 +69,7 @@ jobs:
       name: default
     steps:
       - *fast-checkout
-      - run: make coverage 
+      - run: make coverage
   salus:
     machine: true
     steps:

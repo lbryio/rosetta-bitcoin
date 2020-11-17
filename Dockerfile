@@ -12,29 +12,46 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Build bitcoind
-FROM ubuntu:18.04 as bitcoind-builder
+# Build LBRYCrdd
+FROM ubuntu:18.04 as lbrycrdd-builder
+ENV LANG C.UTF-8
 
 RUN mkdir -p /app \
   && chown -R nobody:nogroup /app
 WORKDIR /app
 
-# Source: https://github.com/bitcoin/bitcoin/blob/master/doc/build-unix.md#ubuntu--debian
-RUN apt-get update && apt-get install -y make gcc g++ autoconf autotools-dev bsdmainutils build-essential git libboost-all-dev \
-  libcurl4-openssl-dev libdb++-dev libevent-dev libssl-dev libtool pkg-config python python-pip libzmq3-dev wget
+# Source: https://github.com/lbryio/lbrycrd/blob/v19_master/packaging/docker-for-gcc/Dockerfile
+RUN set -xe; \
+    apt-get update; \
+    apt-get install --no-install-recommends -y build-essential libtool autotools-dev automake pkg-config git wget apt-utils \
+        librsvg2-bin libtiff-tools cmake imagemagick libcap-dev libz-dev libbz2-dev python-setuptools python3-setuptools xz-utils ccache g++-multilib \
+        g++-mingw-w64-i686 mingw-w64-i686-dev bsdmainutils curl ca-certificates g++-mingw-w64-x86-64 mingw-w64-x86-64-dev \
+        clang-8 lldb-8 lld-8 libc++-8-dev libboost-all-dev libcurl4-openssl-dev libssl-devlibdb++-dev libevent-dev \
+        libssl-dev libtool pkg-config python python-pip libzmq3-dev; \
+    rm -rf /var/lib/apt/lists/*;
 
-# VERSION: Bitcoin Core 0.20.1
-RUN git clone https://github.com/bitcoin/bitcoin \
-  && cd bitcoin \
-  && git checkout 7ff64311bee570874c4f0dfa18f518552188df08
+RUN update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang-cpp-8 80; \
+    update-alternatives --install /usr/bin/clang clang /usr/bin/clang-8 80; \
+    update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++ 80; \
+    update-alternatives --install /usr/bin/cc cc /usr/bin/clang 80; \
+    update-alternatives --set x86_64-w64-mingw32-g++ /usr/bin/x86_64-w64-mingw32-g++-posix; \
+    update-alternatives --set i686-w64-mingw32-g++ /usr/bin/i686-w64-mingw32-g++-posix; \
+    /usr/sbin/update-ccache-symlinks; \
+    cd /usr/include/c++ && ln -s /usr/lib/llvm-8/include/c++/v1; \
+    cd /usr/lib/llvm-8/lib && ln -s libc++abi.so.1 libc++abi.so;
 
-RUN cd bitcoin \
+# VERSION: LBRYcrd 0.17.4.6
+RUN git clone https://github.com/lbryio/lbrycrd \
+  && cd lbrycrd \
+  && git checkout v17_master
+
+RUN cd lbrycrd \
   && ./autogen.sh \
   && ./configure --enable-glibc-back-compat --disable-tests --without-miniupnpc --without-gui --with-incompatible-bdb --disable-hardening --disable-zmq --disable-bench --disable-wallet \
   && make
 
-RUN mv bitcoin/src/bitcoind /app/bitcoind \
-  && rm -rf bitcoin
+RUN mv lbrycrd/src/lbrycrdd /app/lbrycrdd \
+  && rm -rf lbrycrd
 
 # Build Rosetta Server Components
 FROM ubuntu:18.04 as rosetta-builder
@@ -43,7 +60,7 @@ RUN mkdir -p /app \
   && chown -R nobody:nogroup /app
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y curl make gcc g++
+RUN apt-get update && apt-get install -y curl make gcc g++ git
 ENV GOLANG_VERSION 1.15.2
 ENV GOLANG_DOWNLOAD_SHA256 b49fda1ca29a1946d6bb2a5a6982cf07ccd2aba849289508ee0f9918f6bb4552
 ENV GOLANG_DOWNLOAD_URL https://golang.org/dl/go$GOLANG_VERSION.linux-amd64.tar.gz
@@ -58,13 +75,13 @@ ENV PATH $GOPATH/bin:/usr/local/go/bin:$PATH
 RUN mkdir -p "$GOPATH/src" "$GOPATH/bin" && chmod -R 777 "$GOPATH"
 
 # Use native remote build context to build in any directory
-COPY . src 
+COPY . src
 RUN cd src \
   && go build \
   && cd .. \
-  && mv src/rosetta-bitcoin /app/rosetta-bitcoin \
+  && mv src/rosetta-lbry /app/rosetta-lbry \
   && mv src/assets/* /app \
-  && rm -rf src 
+  && rm -rf src
 
 ## Build Final Image
 FROM ubuntu:18.04
@@ -80,8 +97,8 @@ RUN mkdir -p /app \
 
 WORKDIR /app
 
-# Copy binary from bitcoind-builder
-COPY --from=bitcoind-builder /app/bitcoind /app/bitcoind
+# Copy binary from lbrycrdd-builder
+COPY --from=lbrycrdd-builder /app/lbrycrdd /app/lbrycrdd
 
 # Copy binary from rosetta-builder
 COPY --from=rosetta-builder /app/* /app/
@@ -89,4 +106,4 @@ COPY --from=rosetta-builder /app/* /app/
 # Set permissions for everything added to /app
 RUN chmod -R 755 /app/*
 
-CMD ["/app/rosetta-bitcoin"]
+CMD ["/app/rosetta-lbry"]

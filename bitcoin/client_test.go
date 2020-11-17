@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package bitcoin
+package lbry
 
 import (
 	"context"
@@ -24,8 +24,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/coinbase/rosetta-sdk-go/storage"
-	"github.com/coinbase/rosetta-sdk-go/types"
+	"github.com/lbryio/rosetta-sdk-go/storage"
+	"github.com/lbryio/rosetta-sdk-go/types"
 	"github.com/stretchr/testify/assert"
 )
 

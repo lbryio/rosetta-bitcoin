@@ -17,9 +17,9 @@ package indexer
 import (
 	"context"
 
-	"github.com/coinbase/rosetta-sdk-go/parser"
-	"github.com/coinbase/rosetta-sdk-go/storage"
-	"github.com/coinbase/rosetta-sdk-go/types"
+	"github.com/lbryio/rosetta-sdk-go/parser"
+	"github.com/lbryio/rosetta-sdk-go/storage"
+	"github.com/lbryio/rosetta-sdk-go/types"
 )
 
 var _ storage.BalanceStorageHandler = (*BalanceStorageHandler)(nil)
