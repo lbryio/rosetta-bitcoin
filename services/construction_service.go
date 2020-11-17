@@ -24,20 +24,20 @@ import (
 	"math/big"
 	"strconv"
 
-	"github.com/coinbase/rosetta-bitcoin/bitcoin"
-	"github.com/coinbase/rosetta-bitcoin/configuration"
+	"github.com/lbryio/rosetta-lbry/configuration"
+	"github.com/lbryio/rosetta-lbry/lbry"
 
 	"github.com/btcsuite/btcd/btcec"
 	"github.com/btcsuite/btcd/txscript"
 	"github.com/btcsuite/btcd/wire"
 	"github.com/btcsuite/btcutil"
-	"github.com/coinbase/rosetta-sdk-go/parser"
-	"github.com/coinbase/rosetta-sdk-go/server"
-	"github.com/coinbase/rosetta-sdk-go/types"
+	"github.com/lbryio/rosetta-sdk-go/parser"
+	"github.com/lbryio/rosetta-sdk-go/server"
+	"github.com/lbryio/rosetta-sdk-go/types"
 )
 
 const (
-	// bytesInKB is the number of bytes in a KB. In Bitcoin, this is
+	// bytesInKB is the number of bytes in a KB. In lbry, this is
 	// considered to be 1000.
 	bytesInKb = float64(1000) // nolint:gomnd
 
@@ -88,22 +88,22 @@ func (s *ConstructionAPIService) ConstructionDerive(
 
 // estimateSize returns the estimated size of a transaction in vBytes.
 func (s *ConstructionAPIService) estimateSize(operations []*types.Operation) float64 {
-	size := bitcoin.TransactionOverhead
+	size := lbry.TransactionOverhead
 	for _, operation := range operations {
 		switch operation.Type {
-		case bitcoin.InputOpType:
-			size += bitcoin.InputSize
-		case bitcoin.OutputOpType:
-			size += bitcoin.OutputOverhead
+		case lbry.InputOpType:
+			size += lbry.InputSize
+		case lbry.OutputOpType:
+			size += lbry.OutputOverhead
 			addr, err := btcutil.DecodeAddress(operation.Account.Address, s.config.Params)
 			if err != nil {
-				size += bitcoin.P2PKHScriptPubkeySize
+				size += lbry.P2PKHScriptPubkeySize
 				continue
 			}
 
 			script, err := txscript.PayToAddrScript(addr)
 			if err != nil {
-				size += bitcoin.P2PKHScriptPubkeySize
+				size += lbry.P2PKHScriptPubkeySize
 				continue
 			}
 
@@ -123,7 +123,7 @@ func (s *ConstructionAPIService) ConstructionPreprocess(
 	descriptions := &parser.Descriptions{
 		OperationDescriptions: []*parser.OperationDescription{
 			{
-				Type: bitcoin.InputOpType,
+				Type: lbry.InputOpType,
 				Account: &parser.AccountDescription{
 					Exists: true,
 				},
@@ -192,12 +192,12 @@ func (s *ConstructionAPIService) ConstructionMetadata(
 	if options.FeeMultiplier != nil {
 		feePerKB *= *options.FeeMultiplier
 	}
-	if feePerKB < bitcoin.MinFeeRate {
-		feePerKB = bitcoin.MinFeeRate
+	if feePerKB < lbry.MinFeeRate {
+		feePerKB = lbry.MinFeeRate
 	}
 
 	// Calculated the estimated fee in Satoshis
-	satoshisPerB := (feePerKB * float64(bitcoin.SatoshisInBitcoin)) / bytesInKb
+	satoshisPerB := (feePerKB * float64(lbry.SatoshisInlbry)) / bytesInKb
 	estimatedFee := satoshisPerB * options.EstimatedSize
 	suggestedFee := &types.Amount{
 		Value:    fmt.Sprintf("%d", int64(estimatedFee)),
@@ -228,7 +228,7 @@ func (s *ConstructionAPIService) ConstructionPayloads(
 	descriptions := &parser.Descriptions{
 		OperationDescriptions: []*parser.OperationDescription{
 			{
-				Type: bitcoin.InputOpType,
+				Type: lbry.InputOpType,
 				Account: &parser.AccountDescription{
 					Exists: true,
 				},
@@ -241,7 +241,7 @@ func (s *ConstructionAPIService) ConstructionPayloads(
 				CoinAction:   types.CoinSpent,
 			},
 			{
-				Type: bitcoin.OutputOpType,
+				Type: lbry.OutputOpType,
 				Account: &parser.AccountDescription{
 					Exists: true,
 				},
@@ -267,7 +267,7 @@ func (s *ConstructionAPIService) ConstructionPayloads(
 			return nil, wrapErr(ErrUnclearIntent, errors.New("CoinChange cannot be nil"))
 		}
 
-		transactionHash, index, err := bitcoin.ParseCoinIdentifier(input.CoinChange.CoinIdentifier)
+		transactionHash, index, err := lbry.ParseCoinIdentifier(input.CoinChange.CoinIdentifier)
 		if err != nil {
 			return nil, wrapErr(ErrInvalidCoin, err)
 		}
@@ -324,7 +324,7 @@ func (s *ConstructionAPIService) ConstructionPayloads(
 			return nil, wrapErr(ErrUnableToDecodeScriptPubKey, err)
 		}
 
-		class, _, err := bitcoin.ParseSingleAddress(s.config.Params, script)
+		class, _, err := lbry.ParseSingleAddress(s.config.Params, script)
 		if err != nil {
 			return nil, wrapErr(
 				ErrUnableToDecodeAddress,
@@ -413,7 +413,7 @@ func (s *ConstructionAPIService) ConstructionCombine(
 	if err := json.Unmarshal(decodedTx, &unsigned); err != nil {
 		return nil, wrapErr(
 			ErrUnableToParseIntermediateResult,
-			fmt.Errorf("%w unable to unmarshal bitcoin transaction", err),
+			fmt.Errorf("%w unable to unmarshal lbry transaction", err),
 		)
 	}
 
@@ -439,7 +439,7 @@ func (s *ConstructionAPIService) ConstructionCombine(
 			return nil, wrapErr(ErrUnableToDecodeScriptPubKey, err)
 		}
 
-		class, _, err := bitcoin.ParseSingleAddress(s.config.Params, decodedScript)
+		class, _, err := lbry.ParseSingleAddress(s.config.Params, decodedScript)
 		if err != nil {
 			return nil, wrapErr(
 				ErrUnableToDecodeAddress,
@@ -499,7 +499,7 @@ func (s *ConstructionAPIService) ConstructionHash(
 	if err := json.Unmarshal(decodedTx, &signed); err != nil {
 		return nil, wrapErr(
 			ErrUnableToParseIntermediateResult,
-			fmt.Errorf("%w unable to unmarshal signed bitcoin transaction", err),
+			fmt.Errorf("%w unable to unmarshal signed lbry transaction", err),
 		)
 	}
 
@@ -541,7 +541,7 @@ func (s *ConstructionAPIService) parseUnsignedTransaction(
 	if err := json.Unmarshal(decodedTx, &unsigned); err != nil {
 		return nil, wrapErr(
 			ErrUnableToParseIntermediateResult,
-			fmt.Errorf("%w unable to unmarshal bitcoin transaction", err),
+			fmt.Errorf("%w unable to unmarshal lbry transaction", err),
 		)
 	}
 
@@ -569,7 +569,7 @@ func (s *ConstructionAPIService) parseUnsignedTransaction(
 				Index:        int64(len(ops)),
 				NetworkIndex: &networkIndex,
 			},
-			Type: bitcoin.InputOpType,
+			Type: lbry.InputOpType,
 			Account: &types.AccountIdentifier{
 				Address: unsigned.InputAddresses[i],
 			},
@@ -592,7 +592,7 @@ func (s *ConstructionAPIService) parseUnsignedTransaction(
 
 	for i, output := range tx.TxOut {
 		networkIndex := int64(i)
-		_, addr, err := bitcoin.ParseSingleAddress(s.config.Params, output.PkScript)
+		_, addr, err := lbry.ParseSingleAddress(s.config.Params, output.PkScript)
 		if err != nil {
 			return nil, wrapErr(
 				ErrUnableToDecodeAddress,
@@ -605,7 +605,7 @@ func (s *ConstructionAPIService) parseUnsignedTransaction(
 				Index:        int64(len(ops)),
 				NetworkIndex: &networkIndex,
 			},
-			Type: bitcoin.OutputOpType,
+			Type: lbry.OutputOpType,
 			Account: &types.AccountIdentifier{
 				Address: addr.String(),
 			},
@@ -637,7 +637,7 @@ func (s *ConstructionAPIService) parseSignedTransaction(
 	if err := json.Unmarshal(decodedTx, &signed); err != nil {
 		return nil, wrapErr(
 			ErrUnableToParseIntermediateResult,
-			fmt.Errorf("%w unable to unmarshal signed bitcoin transaction", err),
+			fmt.Errorf("%w unable to unmarshal signed lbry transaction", err),
 		)
 	}
 
@@ -668,7 +668,7 @@ func (s *ConstructionAPIService) parseSignedTransaction(
 			)
 		}
 
-		_, addr, err := bitcoin.ParseSingleAddress(s.config.Params, pkScript.Script())
+		_, addr, err := lbry.ParseSingleAddress(s.config.Params, pkScript.Script())
 		if err != nil {
 			return nil, wrapErr(
 				ErrUnableToDecodeAddress,
@@ -685,7 +685,7 @@ func (s *ConstructionAPIService) parseSignedTransaction(
 				Index:        int64(len(ops)),
 				NetworkIndex: &networkIndex,
 			},
-			Type: bitcoin.InputOpType,
+			Type: lbry.InputOpType,
 			Account: &types.AccountIdentifier{
 				Address: addr.EncodeAddress(),
 			},
@@ -708,7 +708,7 @@ func (s *ConstructionAPIService) parseSignedTransaction(
 
 	for i, output := range tx.TxOut {
 		networkIndex := int64(i)
-		_, addr, err := bitcoin.ParseSingleAddress(s.config.Params, output.PkScript)
+		_, addr, err := lbry.ParseSingleAddress(s.config.Params, output.PkScript)
 		if err != nil {
 			return nil, wrapErr(
 				ErrUnableToDecodeAddress,
@@ -721,7 +721,7 @@ func (s *ConstructionAPIService) parseSignedTransaction(
 				Index:        int64(len(ops)),
 				NetworkIndex: &networkIndex,
 			},
-			Type: bitcoin.OutputOpType,
+			Type: lbry.OutputOpType,
 			Account: &types.AccountIdentifier{
 				Address: addr.String(),
 			},
@@ -771,13 +771,13 @@ func (s *ConstructionAPIService) ConstructionSubmit(
 	if err := json.Unmarshal(decodedTx, &signed); err != nil {
 		return nil, wrapErr(
 			ErrUnableToParseIntermediateResult,
-			fmt.Errorf("%w unable to unmarshal signed bitcoin transaction", err),
+			fmt.Errorf("%w unable to unmarshal signed lbry transaction", err),
 		)
 	}
 
 	txHash, err := s.client.SendRawTransaction(ctx, signed.Transaction)
 	if err != nil {
-		return nil, wrapErr(ErrBitcoind, fmt.Errorf("%w unable to submit transaction", err))
+		return nil, wrapErr(Errlbryd, fmt.Errorf("%w unable to submit transaction", err))
 	}
 
 	return &types.TransactionIdentifierResponse{

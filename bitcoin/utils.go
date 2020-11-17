@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package bitcoin
+package lbry
 
 import (
 	"fmt"
@@ -23,7 +23,7 @@ import (
 	"github.com/btcsuite/btcd/chaincfg/chainhash"
 	"github.com/btcsuite/btcd/txscript"
 	"github.com/btcsuite/btcutil"
-	"github.com/coinbase/rosetta-sdk-go/types"
+	"github.com/lbryio/rosetta-sdk-go/types"
 )
 
 // ParseCoinIdentifier returns the corresponding hash and index associated

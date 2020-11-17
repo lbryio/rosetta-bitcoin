@@ -23,13 +23,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/coinbase/rosetta-bitcoin/bitcoin"
-	"github.com/coinbase/rosetta-bitcoin/configuration"
-	mocks "github.com/coinbase/rosetta-bitcoin/mocks/indexer"
+	"github.com/lbryio/rosetta-lbry/configuration"
+	"github.com/lbryio/rosetta-lbry/lbry"
+	mocks "github.com/lbryio/rosetta-lbry/mocks/indexer"
 
-	"github.com/coinbase/rosetta-sdk-go/storage"
-	"github.com/coinbase/rosetta-sdk-go/types"
-	"github.com/coinbase/rosetta-sdk-go/utils"
+	"github.com/lbryio/rosetta-sdk-go/storage"
+	"github.com/lbryio/rosetta-sdk-go/types"
+	"github.com/lbryio/rosetta-sdk-go/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -60,10 +60,10 @@ func TestIndexer_Pruning(t *testing.T) {
 	minHeight := int64(200)
 	cfg := &configuration.Configuration{
 		Network: &types.NetworkIdentifier{
-			Network:    bitcoin.MainnetNetwork,
-			Blockchain: bitcoin.Blockchain,
+			Network:    lbry.MainnetNetwork,
+			Blockchain: lbry.Blockchain,
 		},
-		GenesisBlockIdentifier: bitcoin.MainnetGenesisBlockIdentifier,
+		GenesisBlockIdentifier: lbry.MainnetGenesisBlockIdentifier,
 		Pruning: &configuration.PruningConfiguration{
 			Frequency: 50 * time.Millisecond,
 			Depth:     pruneDepth,
@@ -75,7 +75,7 @@ func TestIndexer_Pruning(t *testing.T) {
 	i, err := Initialize(ctx, cancel, cfg, mockClient)
 	assert.NoError(t, err)
 
-	// Waiting for bitcoind...
+	// Waiting for lbryd...
 	mockClient.On("NetworkStatus", ctx).Return(nil, errors.New("not ready")).Once()
 	mockClient.On("NetworkStatus", ctx).Return(&types.NetworkStatusResponse{}, nil).Once()
 
@@ -84,7 +84,7 @@ func TestIndexer_Pruning(t *testing.T) {
 		CurrentBlockIdentifier: &types.BlockIdentifier{
 			Index: 1000,
 		},
-		GenesisBlockIdentifier: bitcoin.MainnetGenesisBlockIdentifier,
+		GenesisBlockIdentifier: lbry.MainnetGenesisBlockIdentifier,
 	}, nil)
 
 	// Timeout on first request
@@ -132,7 +132,7 @@ func TestIndexer_Pruning(t *testing.T) {
 			parentIdentifier.Hash = getBlockHash(0)
 		}
 
-		block := &bitcoin.Block{
+		block := &lbry.Block{
 			Hash:              identifier.Hash,
 			Height:            identifier.Index,
 			PreviousBlockHash: parentIdentifier.Hash,
@@ -225,10 +225,10 @@ func TestIndexer_Transactions(t *testing.T) {
 	mockClient := &mocks.Client{}
 	cfg := &configuration.Configuration{
 		Network: &types.NetworkIdentifier{
-			Network:    bitcoin.MainnetNetwork,
-			Blockchain: bitcoin.Blockchain,
+			Network:    lbry.MainnetNetwork,
+			Blockchain: lbry.Blockchain,
 		},
-		GenesisBlockIdentifier: bitcoin.MainnetGenesisBlockIdentifier,
+		GenesisBlockIdentifier: lbry.MainnetGenesisBlockIdentifier,
 		IndexerPath:            newDir,
 	}
 
@@ -240,13 +240,13 @@ func TestIndexer_Transactions(t *testing.T) {
 		CurrentBlockIdentifier: &types.BlockIdentifier{
 			Index: 1000,
 		},
-		GenesisBlockIdentifier: bitcoin.MainnetGenesisBlockIdentifier,
+		GenesisBlockIdentifier: lbry.MainnetGenesisBlockIdentifier,
 	}, nil)
 
 	// Add blocks
 	waitForCheck := make(chan struct{})
 	type coinBankEntry struct {
-		Script  *bitcoin.ScriptPubKey
+		Script  *lbry.ScriptPubKey
 		Coin    *types.Coin
 		Account *types.AccountIdentifier
 	}
@@ -271,7 +271,7 @@ func TestIndexer_Transactions(t *testing.T) {
 			rawHash := fmt.Sprintf("block %d transaction %d", i, j)
 			hash := fmt.Sprintf("%x", sha256.Sum256([]byte(rawHash)))
 			coinIdentifier := fmt.Sprintf("%s:%d", hash, index0)
-			scriptPubKey := &bitcoin.ScriptPubKey{
+			scriptPubKey := &lbry.ScriptPubKey{
 				ASM: coinIdentifier,
 			}
 			marshal, err := types.MarshalMap(scriptPubKey)
@@ -286,14 +286,14 @@ func TestIndexer_Transactions(t *testing.T) {
 							Index:        0,
 							NetworkIndex: &index0,
 						},
-						Status: bitcoin.SuccessStatus,
-						Type:   bitcoin.OutputOpType,
+						Status: lbry.SuccessStatus,
+						Type:   lbry.OutputOpType,
 						Account: &types.AccountIdentifier{
 							Address: rawHash,
 						},
 						Amount: &types.Amount{
 							Value:    fmt.Sprintf("%d", rand.Intn(1000)),
-							Currency: bitcoin.TestnetCurrency,
+							Currency: lbry.TestnetCurrency,
 						},
 						CoinChange: &types.CoinChange{
 							CoinAction: types.CoinCreated,
@@ -323,7 +323,7 @@ func TestIndexer_Transactions(t *testing.T) {
 			transactions = append(transactions, tx)
 		}
 
-		block := &bitcoin.Block{
+		block := &lbry.Block{
 			Hash:              identifier.Hash,
 			Height:            identifier.Index,
 			PreviousBlockHash: parentIdentifier.Hash,
@@ -402,13 +402,13 @@ func TestIndexer_Transactions(t *testing.T) {
 			if currBlock.BlockIdentifier.Index == 1000 {
 				// Ensure ScriptPubKeys are accessible.
 				allCoins := []*types.Coin{}
-				expectedPubKeys := []*bitcoin.ScriptPubKey{}
+				expectedPubKeys := []*lbry.ScriptPubKey{}
 				for k, v := range coinBank {
 					allCoins = append(allCoins, &types.Coin{
 						CoinIdentifier: &types.CoinIdentifier{Identifier: k},
 						Amount: &types.Amount{
 							Value:    fmt.Sprintf("-%s", v.Coin.Amount.Value),
-							Currency: bitcoin.TestnetCurrency,
+							Currency: lbry.TestnetCurrency,
 						},
 					})
 					expectedPubKeys = append(expectedPubKeys, v.Script)
@@ -443,10 +443,10 @@ func TestIndexer_Reorg(t *testing.T) {
 	mockClient := &mocks.Client{}
 	cfg := &configuration.Configuration{
 		Network: &types.NetworkIdentifier{
-			Network:    bitcoin.MainnetNetwork,
-			Blockchain: bitcoin.Blockchain,
+			Network:    lbry.MainnetNetwork,
+			Blockchain: lbry.Blockchain,
 		},
-		GenesisBlockIdentifier: bitcoin.MainnetGenesisBlockIdentifier,
+		GenesisBlockIdentifier: lbry.MainnetGenesisBlockIdentifier,
 		IndexerPath:            newDir,
 	}
 
@@ -458,13 +458,13 @@ func TestIndexer_Reorg(t *testing.T) {
 		CurrentBlockIdentifier: &types.BlockIdentifier{
 			Index: 1000,
 		},
-		GenesisBlockIdentifier: bitcoin.MainnetGenesisBlockIdentifier,
+		GenesisBlockIdentifier: lbry.MainnetGenesisBlockIdentifier,
 	}, nil)
 
 	// Add blocks
 	waitForCheck := make(chan struct{})
 	type coinBankEntry struct {
-		Script  *bitcoin.ScriptPubKey
+		Script  *lbry.ScriptPubKey
 		Coin    *types.Coin
 		Account *types.AccountIdentifier
 	}
@@ -490,7 +490,7 @@ func TestIndexer_Reorg(t *testing.T) {
 			rawHash := fmt.Sprintf("block %d transaction %d", i, j)
 			hash := fmt.Sprintf("%x", sha256.Sum256([]byte(rawHash)))
 			coinIdentifier := fmt.Sprintf("%s:%d", hash, index0)
-			scriptPubKey := &bitcoin.ScriptPubKey{
+			scriptPubKey := &lbry.ScriptPubKey{
 				ASM: coinIdentifier,
 			}
 			marshal, err := types.MarshalMap(scriptPubKey)
@@ -505,14 +505,14 @@ func TestIndexer_Reorg(t *testing.T) {
 							Index:        0,
 							NetworkIndex: &index0,
 						},
-						Status: bitcoin.SuccessStatus,
-						Type:   bitcoin.OutputOpType,
+						Status: lbry.SuccessStatus,
+						Type:   lbry.OutputOpType,
 						Account: &types.AccountIdentifier{
 							Address: rawHash,
 						},
 						Amount: &types.Amount{
 							Value:    fmt.Sprintf("%d", rand.Intn(1000)),
-							Currency: bitcoin.TestnetCurrency,
+							Currency: lbry.TestnetCurrency,
 						},
 						CoinChange: &types.CoinChange{
 							CoinAction: types.CoinCreated,
@@ -541,7 +541,7 @@ func TestIndexer_Reorg(t *testing.T) {
 			transactions = append(transactions, tx)
 		}
 
-		block := &bitcoin.Block{
+		block := &lbry.Block{
 			Hash:              identifier.Hash,
 			Height:            identifier.Index,
 			PreviousBlockHash: parentIdentifier.Hash,
@@ -685,10 +685,10 @@ func TestIndexer_HeaderReorg(t *testing.T) {
 	mockClient := &mocks.Client{}
 	cfg := &configuration.Configuration{
 		Network: &types.NetworkIdentifier{
-			Network:    bitcoin.MainnetNetwork,
-			Blockchain: bitcoin.Blockchain,
+			Network:    lbry.MainnetNetwork,
+			Blockchain: lbry.Blockchain,
 		},
-		GenesisBlockIdentifier: bitcoin.MainnetGenesisBlockIdentifier,
+		GenesisBlockIdentifier: lbry.MainnetGenesisBlockIdentifier,
 		IndexerPath:            newDir,
 	}
 
@@ -700,7 +700,7 @@ func TestIndexer_HeaderReorg(t *testing.T) {
 		CurrentBlockIdentifier: &types.BlockIdentifier{
 			Index: 1000,
 		},
-		GenesisBlockIdentifier: bitcoin.MainnetGenesisBlockIdentifier,
+		GenesisBlockIdentifier: lbry.MainnetGenesisBlockIdentifier,
 	}, nil)
 
 	// Add blocks
@@ -720,7 +720,7 @@ func TestIndexer_HeaderReorg(t *testing.T) {
 		}
 
 		transactions := []*types.Transaction{}
-		block := &bitcoin.Block{
+		block := &lbry.Block{
 			Hash:              identifier.Hash,
 			Height:            identifier.Index,
 			PreviousBlockHash: parentIdentifier.Hash,
@@ -747,7 +747,7 @@ func TestIndexer_HeaderReorg(t *testing.T) {
 				mock.Anything,
 				&types.PartialBlockIdentifier{Index: &identifier.Index},
 			).Return(
-				&bitcoin.Block{
+				&lbry.Block{
 					Hash:              identifier.Hash,
 					Height:            identifier.Index,
 					PreviousBlockHash: "blah",
