@@ -286,7 +286,7 @@ func TestIndexer_Transactions(t *testing.T) {
 							Index:        0,
 							NetworkIndex: &index0,
 						},
-						Status: lbry.SuccessStatus,
+						Status: types.String(lbry.SuccessStatus),
 						Type:   lbry.OutputOpType,
 						Account: &types.AccountIdentifier{
 							Address: rawHash,
@@ -505,7 +505,7 @@ func TestIndexer_Reorg(t *testing.T) {
 							Index:        0,
 							NetworkIndex: &index0,
 						},
-						Status: lbry.SuccessStatus,
+						Status: types.String(lbry.SuccessStatus),
 						Type:   lbry.OutputOpType,
 						Account: &types.AccountIdentifier{
 							Address: rawHash,
