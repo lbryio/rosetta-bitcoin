@@ -19,7 +19,7 @@ import (
 
 	"github.com/lbryio/rosetta-lbry/lbry"
 
-	"github.com/lbryio/rosetta-sdk-go/types"
+	"github.com/coinbase/rosetta/types"
 )
 
 const (

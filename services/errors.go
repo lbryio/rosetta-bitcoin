@@ -15,7 +15,7 @@
 package services
 
 import (
-	"github.com/lbryio/rosetta-sdk-go/types"
+	"github.com/coinbase/rosetta/types"
 )
 
 var (

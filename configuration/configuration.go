@@ -25,8 +25,8 @@ import (
 	"github.com/lbryio/rosetta-lbry/lbry"
 
 	"github.com/btcsuite/btcd/chaincfg"
-	"github.com/lbryio/rosetta-sdk-go/storage"
-	"github.com/lbryio/rosetta-sdk-go/types"
+	"github.com/coinbase/rosetta/storage"
+	"github.com/coinbase/rosetta/types"
 )
 
 // Mode is the setting that determines if

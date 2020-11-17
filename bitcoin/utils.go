@@ -23,7 +23,7 @@ import (
 	"github.com/btcsuite/btcd/chaincfg/chainhash"
 	"github.com/btcsuite/btcd/txscript"
 	"github.com/btcsuite/btcutil"
-	"github.com/lbryio/rosetta-sdk-go/types"
+	"github.com/coinbase/rosetta/types"
 )
 
 // ParseCoinIdentifier returns the corresponding hash and index associated

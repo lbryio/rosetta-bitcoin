@@ -23,7 +23,7 @@ import (
 	"github.com/lbryio/rosetta-lbry/lbry"
 	mocks "github.com/lbryio/rosetta-lbry/mocks/services"
 
-	"github.com/lbryio/rosetta-sdk-go/types"
+	"github.com/coinbase/rosetta/types"
 	"github.com/stretchr/testify/assert"
 )
 

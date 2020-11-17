@@ -25,13 +25,13 @@ import (
 	"github.com/lbryio/rosetta-lbry/services"
 	"github.com/lbryio/rosetta-lbry/utils"
 
+	"github.com/coinbase/rosetta/asserter"
+	"github.com/coinbase/rosetta/storage"
+	"github.com/coinbase/rosetta/syncer"
+	"github.com/coinbase/rosetta/types"
+	sdkUtils "github.com/coinbase/rosetta/utils"
 	"github.com/dgraph-io/badger/v2"
 	"github.com/dgraph-io/badger/v2/options"
-	"github.com/lbryio/rosetta-sdk-go/asserter"
-	"github.com/lbryio/rosetta-sdk-go/storage"
-	"github.com/lbryio/rosetta-sdk-go/syncer"
-	"github.com/lbryio/rosetta-sdk-go/types"
-	sdkUtils "github.com/lbryio/rosetta-sdk-go/utils"
 )
 
 const (

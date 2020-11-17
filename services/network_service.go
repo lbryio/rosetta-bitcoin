@@ -20,8 +20,8 @@ import (
 	"github.com/lbryio/rosetta-lbry/configuration"
 	"github.com/lbryio/rosetta-lbry/lbry"
 
-	"github.com/lbryio/rosetta-sdk-go/server"
-	"github.com/lbryio/rosetta-sdk-go/types"
+	"github.com/coinbase/rosetta/server"
+	"github.com/coinbase/rosetta/types"
 )
 
 // NetworkAPIService implements the server.NetworkAPIServicer interface.

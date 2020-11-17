@@ -22,9 +22,9 @@ import (
 
 	"github.com/lbryio/rosetta-lbry/lbry"
 
-	"github.com/lbryio/rosetta-sdk-go/storage"
-	"github.com/lbryio/rosetta-sdk-go/types"
-	"github.com/lbryio/rosetta-sdk-go/utils"
+	"github.com/coinbase/rosetta/storage"
+	"github.com/coinbase/rosetta/types"
+	"github.com/coinbase/rosetta/utils"
 	"github.com/stretchr/testify/assert"
 )
 
