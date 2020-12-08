@@ -19,8 +19,8 @@ import (
 
 	"github.com/lbryio/rosetta-lbry/configuration"
 
-	"github.com/coinbase/rosetta/asserter"
-	"github.com/coinbase/rosetta/server"
+	"github.com/coinbase/rosetta-sdk-go/asserter"
+	"github.com/coinbase/rosetta-sdk-go/server"
 )
 
 // NewBlockchainRouter creates a Mux http.Handler from a collection

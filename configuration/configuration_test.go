@@ -22,9 +22,9 @@ import (
 
 	"github.com/lbryio/rosetta-lbry/lbry"
 
-	"github.com/coinbase/rosetta/storage"
-	"github.com/coinbase/rosetta/types"
-	"github.com/coinbase/rosetta/utils"
+	"github.com/coinbase/rosetta-sdk-go/storage"
+	"github.com/coinbase/rosetta-sdk-go/types"
+	"github.com/coinbase/rosetta-sdk-go/utils"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -143,7 +143,7 @@ func TestLoadConfiguration(t *testing.T) {
 				assert.Contains(t, err.Error(), test.err.Error())
 			} else {
 				test.cfg.IndexerPath = path.Join(newDir, "indexer")
-				test.cfg.lbrydPath = path.Join(newDir, "lbryd")
+				test.cfg.lbrycrddPath = path.Join(newDir, "lbrycrdd")
 				assert.Equal(t, test.cfg, cfg)
 				assert.NoError(t, err)
 			}

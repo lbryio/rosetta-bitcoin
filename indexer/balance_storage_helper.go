@@ -17,10 +17,10 @@ package indexer
 import (
 	"context"
 
-	"github.com/coinbase/rosetta/asserter"
-	"github.com/coinbase/rosetta/parser"
-	"github.com/coinbase/rosetta/storage"
-	"github.com/coinbase/rosetta/types"
+	"github.com/coinbase/rosetta-sdk-go/asserter"
+	"github.com/coinbase/rosetta-sdk-go/parser"
+	"github.com/coinbase/rosetta-sdk-go/storage"
+	"github.com/coinbase/rosetta-sdk-go/types"
 )
 
 var _ storage.BalanceStorageHelper = (*BalanceStorageHelper)(nil)

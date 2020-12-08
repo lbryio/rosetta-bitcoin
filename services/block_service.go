@@ -19,8 +19,8 @@ import (
 
 	"github.com/lbryio/rosetta-lbry/configuration"
 
-	"github.com/coinbase/rosetta/server"
-	"github.com/coinbase/rosetta/types"
+	"github.com/coinbase/rosetta-sdk-go/server"
+	"github.com/coinbase/rosetta-sdk-go/types"
 )
 
 // BlockAPIService implements the server.BlockAPIServicer interface.

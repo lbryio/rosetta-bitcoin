@@ -20,8 +20,8 @@ import (
 	"github.com/lbryio/rosetta-lbry/configuration"
 	"github.com/lbryio/rosetta-lbry/lbry"
 
-	"github.com/coinbase/rosetta/server"
-	"github.com/coinbase/rosetta/types"
+	"github.com/coinbase/rosetta-sdk-go/server"
+	"github.com/coinbase/rosetta-sdk-go/types"
 )
 
 // NetworkAPIService implements the server.NetworkAPIServicer interface.
@@ -67,7 +67,7 @@ func (s *NetworkAPIService) NetworkStatus(
 
 	peers, err := s.client.GetPeers(ctx)
 	if err != nil {
-		return nil, wrapErr(Errlbryd, err)
+		return nil, wrapErr(ErrLbrycrdd, err)
 	}
 
 	cachedBlockResponse, err := s.i.GetBlockLazy(ctx, nil)

@@ -1,6 +1,6 @@
 {
   "network": {
-    "blockchain": "LBRY",
+    "blockchain": "lbry",
     "network": "Testnet3"
   },
   "data_directory": "cli-data",

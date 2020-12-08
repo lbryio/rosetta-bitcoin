@@ -19,7 +19,7 @@ import (
 	"strings"
 
 	"github.com/btcsuite/btcd/chaincfg"
-	"github.com/coinbase/rosetta/types"
+	"github.com/coinbase/rosetta-sdk-go/types"
 )
 
 const (
@@ -39,7 +39,7 @@ const (
 	Decimals = 8
 
 	// SatoshisInlbry is the number of
-	// Satoshis in 1 BTC (10^8).
+	// Satoshis in 1 LBC (10^8).
 	SatoshisInlbry = 100000000
 
 	// InputOpType is used to describe
@@ -69,7 +69,7 @@ const (
 	// of any transaction hash in lbry.
 	TransactionHashLength = 64
 
-	// NullData is returned by lbryd
+	// NullData is returned by lbrycrdd
 	// as the ScriptPubKey.Type for OP_RETURN
 	// locking scripts.
 	NullData = "nulldata"
@@ -88,21 +88,21 @@ const (
 var (
 	// MainnetGenesisBlockIdentifier is the genesis block for mainnet.
 	MainnetGenesisBlockIdentifier = &types.BlockIdentifier{
-		Hash: "000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f",
+		Hash: "9c89283ba0f3227f6c03b70216b9f665f0118d5e0fa729cedf4fb34d6a34f463",
 	}
 
 	// MainnetParams are the params for mainnet.
-	MainnetParams = &chaincfg.MainNetParams
+	MainnetParams = &LbryMainnetParams
 
 	// MainnetCurrency is the *types.Currency for mainnet.
 	MainnetCurrency = &types.Currency{
-		Symbol:   "BTC",
+		Symbol:   "LBC",
 		Decimals: Decimals,
 	}
 
 	// TestnetGenesisBlockIdentifier is the genesis block for testnet.
 	TestnetGenesisBlockIdentifier = &types.BlockIdentifier{
-		Hash: "000000000933ea01ad0ee984209779baaec3ced90fa3f408719526f8d77f4943",
+		Hash: "9c89283ba0f3227f6c03b70216b9f665f0118d5e0fa729cedf4fb34d6a34f463",
 	}
 
 	// TestnetParams are the params for testnet.
@@ -110,7 +110,7 @@ var (
 
 	// TestnetCurrency is the *types.Currency for testnet.
 	TestnetCurrency = &types.Currency{
-		Symbol:   "tBTC",
+		Symbol:   "tLBC",
 		Decimals: Decimals,
 	}
 

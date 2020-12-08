@@ -29,9 +29,9 @@ import (
 	lbryUtils "github.com/lbryio/rosetta-lbry/utils"
 
 	"github.com/btcsuite/btcutil"
-	"github.com/coinbase/rosetta/storage"
-	"github.com/coinbase/rosetta/types"
-	"github.com/coinbase/rosetta/utils"
+	"github.com/coinbase/rosetta-sdk-go/storage"
+	"github.com/coinbase/rosetta-sdk-go/types"
+	"github.com/coinbase/rosetta-sdk-go/utils"
 )
 
 const (
@@ -94,7 +94,7 @@ const (
 	timeMultiplier = 1000
 
 	// rpc credentials are fixed in rosetta-lbry
-	// because we never expose access to the raw lbryd
+	// because we never expose access to the raw lbrycrdd
 	// endpoints (that could be used perform an attack, like
 	// changing our peers).
 	rpcUsername = "rosetta"
@@ -110,7 +110,7 @@ var (
 	ErrJSONRPCError = errors.New("JSON-RPC error")
 )
 
-// Client is used to fetch blocks from lbryd and
+// Client is used to fetch blocks from lbrycrdd and
 // to parse lbry block data into Rosetta types.
 //
 // We opted not to use existing lbry RPC libraries
@@ -162,7 +162,7 @@ func newHTTPClient(timeout time.Duration) *http.Client {
 }
 
 // NetworkStatus returns the *types.NetworkStatusResponse for
-// lbryd.
+// lbrycrdd.
 func (b *Client) NetworkStatus(ctx context.Context) (*types.NetworkStatusResponse, error) {
 	rawBlock, err := b.getBlock(ctx, nil)
 	if err != nil {
@@ -264,7 +264,7 @@ func (b *Client) ParseBlock(
 }
 
 // SendRawTransaction submits a serialized transaction
-// to lbryd.
+// to lbrycrdd.
 func (b *Client) SendRawTransaction(
 	ctx context.Context,
 	serializedTx string,
@@ -657,7 +657,7 @@ func (b *Client) parseOutputTransactionOperation(
 		CoinAction: types.CoinCreated,
 	}
 
-	// If we are unable to parse the output account (i.e. lbryd
+	// If we are unable to parse the output account (i.e. lbrycrdd
 	// returns a blank/nonstandard ScriptPubKey), we create an address as the
 	// concatenation of the tx hash and index.
 	//

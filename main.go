@@ -30,9 +30,9 @@ import (
 	"github.com/lbryio/rosetta-lbry/services"
 	"github.com/lbryio/rosetta-lbry/utils"
 
-	"github.com/coinbase/rosetta/asserter"
-	"github.com/coinbase/rosetta/server"
-	"github.com/coinbase/rosetta/types"
+	"github.com/coinbase/rosetta-sdk-go/asserter"
+	"github.com/coinbase/rosetta-sdk-go/server"
+	"github.com/coinbase/rosetta-sdk-go/types"
 	"github.com/grpc-ecosystem/go-grpc-middleware/logging/zap/ctxzap"
 	"go.uber.org/zap"
 	"golang.org/x/sync/errgroup"

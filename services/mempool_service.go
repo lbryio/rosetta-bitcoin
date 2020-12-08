@@ -19,8 +19,8 @@ import (
 
 	"github.com/lbryio/rosetta-lbry/configuration"
 
-	"github.com/coinbase/rosetta/server"
-	"github.com/coinbase/rosetta/types"
+	"github.com/coinbase/rosetta-sdk-go/server"
+	"github.com/coinbase/rosetta-sdk-go/types"
 )
 
 // MempoolAPIService implements the server.MempoolAPIServicer interface.
@@ -51,7 +51,7 @@ func (s *MempoolAPIService) Mempool(
 
 	mempoolTransactions, err := s.client.RawMempool(ctx)
 	if err != nil {
-		return nil, wrapErr(Errlbryd, err)
+		return nil, wrapErr(ErrLbrycrdd, err)
 	}
 
 	transactionIdentifiers := make([]*types.TransactionIdentifier, len(mempoolTransactions))

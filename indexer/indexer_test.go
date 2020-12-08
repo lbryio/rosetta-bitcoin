@@ -27,9 +27,9 @@ import (
 	"github.com/lbryio/rosetta-lbry/lbry"
 	mocks "github.com/lbryio/rosetta-lbry/mocks/indexer"
 
-	"github.com/coinbase/rosetta/storage"
-	"github.com/coinbase/rosetta/types"
-	"github.com/coinbase/rosetta/utils"
+	"github.com/coinbase/rosetta-sdk-go/storage"
+	"github.com/coinbase/rosetta-sdk-go/types"
+	"github.com/coinbase/rosetta-sdk-go/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -75,7 +75,7 @@ func TestIndexer_Pruning(t *testing.T) {
 	i, err := Initialize(ctx, cancel, cfg, mockClient)
 	assert.NoError(t, err)
 
-	// Waiting for lbryd...
+	// Waiting for lbrycrdd...
 	mockClient.On("NetworkStatus", ctx).Return(nil, errors.New("not ready")).Once()
 	mockClient.On("NetworkStatus", ctx).Return(&types.NetworkStatusResponse{}, nil).Once()
 

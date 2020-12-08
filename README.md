@@ -139,7 +139,7 @@ on your OS. There is a great tutorial for how to do this on Linux [here](https:/
 ## Architecture
 
 `rosetta-bitcoin` uses the `syncer`, `storage`, `parser`, and `server` package
-from [`rosetta-sdk-go`](https://github.com/coinbase/rosetta) instead
+from [`rosetta-sdk-go`](https://github.com/coinbase/rosetta-sdk-go) instead
 of a new Bitcoin-specific implementation of packages of similar functionality. Below
 you can find a high-level overview of how everything fits together:
 

@@ -24,31 +24,32 @@ WORKDIR /app
 RUN set -xe; \
     apt-get update; \
     apt-get install --no-install-recommends -y build-essential libtool autotools-dev automake pkg-config git wget apt-utils \
-        librsvg2-bin libtiff-tools cmake imagemagick libcap-dev libz-dev libbz2-dev python-setuptools python3-setuptools xz-utils ccache g++-multilib \
-        g++-mingw-w64-i686 mingw-w64-i686-dev bsdmainutils curl ca-certificates g++-mingw-w64-x86-64 mingw-w64-x86-64-dev \
-        clang-8 lldb-8 lld-8 libc++-8-dev libboost-all-dev libcurl4-openssl-dev libssl-devlibdb++-dev libevent-dev \
-        libssl-dev libtool pkg-config python python-pip libzmq3-dev; \
-    rm -rf /var/lib/apt/lists/*;
+        librsvg2-bin cmake libcap-dev libz-dev libbz2-dev python-setuptools python3-setuptools xz-utils ccache \
+        bsdmainutils curl ca-certificates; \
+    rm -rf /var/lib/apt/lists/*; \
+    /usr/sbin/update-ccache-symlinks;
 
-RUN update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang-cpp-8 80; \
-    update-alternatives --install /usr/bin/clang clang /usr/bin/clang-8 80; \
-    update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++ 80; \
-    update-alternatives --install /usr/bin/cc cc /usr/bin/clang 80; \
-    update-alternatives --set x86_64-w64-mingw32-g++ /usr/bin/x86_64-w64-mingw32-g++-posix; \
-    update-alternatives --set i686-w64-mingw32-g++ /usr/bin/i686-w64-mingw32-g++-posix; \
-    /usr/sbin/update-ccache-symlinks; \
-    cd /usr/include/c++ && ln -s /usr/lib/llvm-8/include/c++/v1; \
-    cd /usr/lib/llvm-8/lib && ln -s libc++abi.so.1 libc++abi.so;
-
-# VERSION: LBRYcrd 0.17.4.6
+# VERSION: LBRYcrd 0.19.1.3
 RUN git clone https://github.com/lbryio/lbrycrd \
   && cd lbrycrd \
-  && git checkout v17_master
+  && git checkout v0.19.1.3
+
+ENV CXXFLAGS "${CXXFLAGS:--frecord-gcc-switches}"
+
+RUN cd lbrycrd \
+&& cd depends \
+&& make -j$(getconf _NPROCESSORS_ONLN) HOST=x86_64-pc-linux-gnu NO_QT=1 V=1
+
+ENV DEPS_DIR /app/lbrycrd/depends/x86_64-pc-linux-gnu
+RUN echo $DEPS_DIR
+
+ENV CONFIG_SITE ${DEPS_DIR}/share/config.site
+RUN echo $CONFIG_SITE
 
 RUN cd lbrycrd \
   && ./autogen.sh \
-  && ./configure --enable-glibc-back-compat --disable-tests --without-miniupnpc --without-gui --with-incompatible-bdb --disable-hardening --disable-zmq --disable-bench --disable-wallet \
-  && make
+  && ./configure --enable-static --with-pic --disable-shared --enable-glibc-back-compat --disable-tests --without-miniupnpc --without-gui --with-incompatible-bdb --disable-hardening --disable-zmq --disable-bench --disable-wallet \
+  && make -j$(getconf _NPROCESSORS_ONLN)
 
 RUN mv lbrycrd/src/lbrycrdd /app/lbrycrdd \
   && rm -rf lbrycrd

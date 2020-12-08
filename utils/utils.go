@@ -18,7 +18,7 @@ import (
 	"context"
 	"time"
 
-	sdkUtils "github.com/coinbase/rosetta/utils"
+	sdkUtils "github.com/coinbase/rosetta-sdk-go/utils"
 	"github.com/grpc-ecosystem/go-grpc-middleware/logging/zap/ctxzap"
 	"go.uber.org/zap"
 )

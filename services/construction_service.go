@@ -31,9 +31,9 @@ import (
 	"github.com/btcsuite/btcd/txscript"
 	"github.com/btcsuite/btcd/wire"
 	"github.com/btcsuite/btcutil"
-	"github.com/coinbase/rosetta/parser"
-	"github.com/coinbase/rosetta/server"
-	"github.com/coinbase/rosetta/types"
+	"github.com/coinbase/rosetta-sdk-go/parser"
+	"github.com/coinbase/rosetta-sdk-go/server"
+	"github.com/coinbase/rosetta-sdk-go/types"
 )
 
 const (
@@ -777,7 +777,7 @@ func (s *ConstructionAPIService) ConstructionSubmit(
 
 	txHash, err := s.client.SendRawTransaction(ctx, signed.Transaction)
 	if err != nil {
-		return nil, wrapErr(Errlbryd, fmt.Errorf("%w unable to submit transaction", err))
+		return nil, wrapErr(ErrLbrycrdd, fmt.Errorf("%w unable to submit transaction", err))
 	}
 
 	return &types.TransactionIdentifierResponse{

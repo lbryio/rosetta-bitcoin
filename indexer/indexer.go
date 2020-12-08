@@ -25,11 +25,11 @@ import (
 	"github.com/lbryio/rosetta-lbry/services"
 	"github.com/lbryio/rosetta-lbry/utils"
 
-	"github.com/coinbase/rosetta/asserter"
-	"github.com/coinbase/rosetta/storage"
-	"github.com/coinbase/rosetta/syncer"
-	"github.com/coinbase/rosetta/types"
-	sdkUtils "github.com/coinbase/rosetta/utils"
+	"github.com/coinbase/rosetta-sdk-go/asserter"
+	"github.com/coinbase/rosetta-sdk-go/storage"
+	"github.com/coinbase/rosetta-sdk-go/syncer"
+	"github.com/coinbase/rosetta-sdk-go/types"
+	sdkUtils "github.com/coinbase/rosetta-sdk-go/utils"
 	"github.com/dgraph-io/badger/v2"
 	"github.com/dgraph-io/badger/v2/options"
 )
@@ -219,7 +219,7 @@ func Initialize(
 	return i, nil
 }
 
-// waitForNode returns once lbryd is ready to serve
+// waitForNode returns once lbrycrdd is ready to serve
 // block queries.
 func (i *Indexer) waitForNode(ctx context.Context) error {
 	logger := utils.ExtractLogger(ctx, "indexer")
@@ -229,7 +229,7 @@ func (i *Indexer) waitForNode(ctx context.Context) error {
 			return nil
 		}
 
-		logger.Infow("waiting for lbryd...")
+		logger.Infow("waiting for lbrycrdd...")
 		if err := sdkUtils.ContextSleep(ctx, nodeWaitSleep); err != nil {
 			return err
 		}
@@ -270,7 +270,7 @@ func (i *Indexer) Sync(ctx context.Context) error {
 	return syncer.Sync(ctx, startIndex, indexPlaceholder)
 }
 
-// Prune attempts to prune blocks in lbryd every
+// Prune attempts to prune blocks in lbrycrdd every
 // pruneFrequency.
 func (i *Indexer) Prune(ctx context.Context) error {
 	logger := utils.ExtractLogger(ctx, "pruner")
@@ -298,16 +298,16 @@ func (i *Indexer) Prune(ctx context.Context) error {
 				continue
 			}
 
-			logger.Infow("attempting to prune lbryd", "prune height", pruneHeight)
+			logger.Infow("attempting to prune lbrycrdd", "prune height", pruneHeight)
 			prunedHeight, err := i.client.PruneBlockchain(ctx, pruneHeight)
 			if err != nil {
 				logger.Warnw(
-					"unable to prune lbryd",
+					"unable to prune lbrycrdd",
 					"prune height", pruneHeight,
 					"error", err,
 				)
 			} else {
-				logger.Infow("pruned lbryd", "prune height", prunedHeight)
+				logger.Infow("pruned lbrycrdd", "prune height", prunedHeight)
 			}
 		}
 	}
