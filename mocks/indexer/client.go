@@ -5,7 +5,7 @@ package indexer
 import (
 	context "context"
 
-	bitcoin "github.com/coinbase/rosetta-bitcoin/bitcoin"
+	lbry "github.com/lbryio/rosetta-lbry/lbry"
 
 	mock "github.com/stretchr/testify/mock"
 
@@ -18,15 +18,15 @@ type Client struct {
 }
 
 // GetRawBlock provides a mock function with given fields: _a0, _a1
-func (_m *Client) GetRawBlock(_a0 context.Context, _a1 *types.PartialBlockIdentifier) (*bitcoin.Block, []string, error) {
+func (_m *Client) GetRawBlock(_a0 context.Context, _a1 *types.PartialBlockIdentifier) (*lbry.Block, []string, error) {
 	ret := _m.Called(_a0, _a1)
 
-	var r0 *bitcoin.Block
-	if rf, ok := ret.Get(0).(func(context.Context, *types.PartialBlockIdentifier) *bitcoin.Block); ok {
+	var r0 *lbry.Block
+	if rf, ok := ret.Get(0).(func(context.Context, *types.PartialBlockIdentifier) *lbry.Block); ok {
 		r0 = rf(_a0, _a1)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*bitcoin.Block)
+			r0 = ret.Get(0).(*lbry.Block)
 		}
 	}
 

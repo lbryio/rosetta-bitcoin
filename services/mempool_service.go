@@ -17,7 +17,7 @@ package services
 import (
 	"context"
 
-	"github.com/coinbase/rosetta-bitcoin/configuration"
+	"github.com/lbryio/rosetta-lbry/configuration"
 
 	"github.com/coinbase/rosetta-sdk-go/server"
 	"github.com/coinbase/rosetta-sdk-go/types"
@@ -51,7 +51,7 @@ func (s *MempoolAPIService) Mempool(
 
 	mempoolTransactions, err := s.client.RawMempool(ctx)
 	if err != nil {
-		return nil, wrapErr(ErrBitcoind, err)
+		return nil, wrapErr(ErrLbrycrdd, err)
 	}
 
 	transactionIdentifiers := make([]*types.TransactionIdentifier, len(mempoolTransactions))

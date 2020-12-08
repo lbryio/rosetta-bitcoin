@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package bitcoin
+package lbry
 
 import (
 	"bufio"
@@ -23,14 +23,14 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/coinbase/rosetta-bitcoin/utils"
+	"github.com/lbryio/rosetta-lbry/utils"
 
 	"golang.org/x/sync/errgroup"
 )
 
 const (
-	bitcoindLogger       = "bitcoind"
-	bitcoindStdErrLogger = "bitcoind stderr"
+	lbrycrddLogger       = "lbrycrdd"
+	lbrycrddStdErrLogger = "lbrycrdd stderr"
 )
 
 func logPipe(ctx context.Context, pipe io.ReadCloser, identifier string) error {
@@ -51,8 +51,8 @@ func logPipe(ctx context.Context, pipe io.ReadCloser, identifier string) error {
 			message = messages[1]
 		}
 
-		// Print debug log if from bitcoindLogger
-		if identifier == bitcoindLogger {
+		// Print debug log if from lbrycrddLogger
+		if identifier == lbrycrddLogger {
 			logger.Debugw(message)
 			continue
 		}
@@ -61,12 +61,12 @@ func logPipe(ctx context.Context, pipe io.ReadCloser, identifier string) error {
 	}
 }
 
-// StartBitcoind starts a bitcoind daemon in another goroutine
+// Startlbrycrdd starts a lbrycrdd daemon in another goroutine
 // and logs the results to the console.
-func StartBitcoind(ctx context.Context, configPath string, g *errgroup.Group) error {
-	logger := utils.ExtractLogger(ctx, "bitcoind")
+func Startlbrycrdd(ctx context.Context, configPath string, g *errgroup.Group) error {
+	logger := utils.ExtractLogger(ctx, "lbrycrdd")
 	cmd := exec.Command(
-		"/app/bitcoind",
+		"/app/lbrycrdd",
 		fmt.Sprintf("--conf=%s", configPath),
 	) // #nosec G204
 
@@ -81,21 +81,21 @@ func StartBitcoind(ctx context.Context, configPath string, g *errgroup.Group) er
 	}
 
 	g.Go(func() error {
-		return logPipe(ctx, stdout, bitcoindLogger)
+		return logPipe(ctx, stdout, lbrycrddLogger)
 	})
 
 	g.Go(func() error {
-		return logPipe(ctx, stderr, bitcoindStdErrLogger)
+		return logPipe(ctx, stderr, lbrycrddStdErrLogger)
 	})
 
 	if err := cmd.Start(); err != nil {
-		return fmt.Errorf("%w: unable to start bitcoind", err)
+		return fmt.Errorf("%w: unable to start lbrycrdd", err)
 	}
 
 	g.Go(func() error {
 		<-ctx.Done()
 
-		logger.Warnw("sending interrupt to bitcoind")
+		logger.Warnw("sending interrupt to lbrycrdd")
 		return cmd.Process.Signal(os.Interrupt)
 	})
 

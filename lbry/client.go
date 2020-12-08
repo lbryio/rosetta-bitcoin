@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package bitcoin
+package lbry
 
 import (
 	"bytes"
@@ -26,7 +26,7 @@ import (
 	"strconv"
 	"time"
 
-	bitcoinUtils "github.com/coinbase/rosetta-bitcoin/utils"
+	lbryUtils "github.com/lbryio/rosetta-lbry/utils"
 
 	"github.com/btcsuite/btcutil"
 	"github.com/coinbase/rosetta-sdk-go/types"
@@ -35,7 +35,7 @@ import (
 
 const (
 	// genesisBlockIndex is the height of the block we consider to be the
-	// genesis block of the bitcoin blockchain for polling
+	// genesis block of the lbry blockchain for polling
 	genesisBlockIndex = 0
 
 	// requestID is the JSON-RPC request ID we use for making requests.
@@ -56,28 +56,28 @@ const (
 type requestMethod string
 
 const (
-	// https://bitcoin.org/en/developer-reference#getblock
+	// https://lbry.org/en/developer-reference#getblock
 	requestMethodGetBlock requestMethod = "getblock"
 
-	// https://bitcoin.org/en/developer-reference#getblockhash
+	// https://lbry.org/en/developer-reference#getblockhash
 	requestMethodGetBlockHash requestMethod = "getblockhash"
 
-	// https://bitcoin.org/en/developer-reference#getblockchaininfo
+	// https://lbry.org/en/developer-reference#getblockchaininfo
 	requestMethodGetBlockchainInfo requestMethod = "getblockchaininfo"
 
-	// https://developer.bitcoin.org/reference/rpc/getpeerinfo.html
+	// https://developer.lbry.org/reference/rpc/getpeerinfo.html
 	requestMethodGetPeerInfo requestMethod = "getpeerinfo"
 
-	// https://developer.bitcoin.org/reference/rpc/pruneblockchain.html
+	// https://developer.lbry.org/reference/rpc/pruneblockchain.html
 	requestMethodPruneBlockchain requestMethod = "pruneblockchain"
 
-	// https://developer.bitcoin.org/reference/rpc/sendrawtransaction.html
+	// https://developer.lbry.org/reference/rpc/sendrawtransaction.html
 	requestMethodSendRawTransaction requestMethod = "sendrawtransaction"
 
-	// https://developer.bitcoin.org/reference/rpc/estimatesmartfee.html
+	// https://developer.lbry.org/reference/rpc/estimatesmartfee.html
 	requestMethodEstimateSmartFee requestMethod = "estimatesmartfee"
 
-	// https://developer.bitcoin.org/reference/rpc/getrawmempool.html
+	// https://developer.lbry.org/reference/rpc/getrawmempool.html
 	requestMethodRawMempool requestMethod = "getrawmempool"
 
 	// blockNotFoundErrCode is the RPC error code when a block cannot be found
@@ -89,11 +89,11 @@ const (
 	dialTimeout    = 5 * time.Second
 
 	// timeMultiplier is used to multiply the time
-	// returned in Bitcoin blocks to be milliseconds.
+	// returned in lbry blocks to be milliseconds.
 	timeMultiplier = 1000
 
-	// rpc credentials are fixed in rosetta-bitcoin
-	// because we never expose access to the raw bitcoind
+	// rpc credentials are fixed in rosetta-lbry
+	// because we never expose access to the raw lbrycrdd
 	// endpoints (that could be used perform an attack, like
 	// changing our peers).
 	rpcUsername = "rosetta"
@@ -109,10 +109,10 @@ var (
 	ErrJSONRPCError = errors.New("JSON-RPC error")
 )
 
-// Client is used to fetch blocks from bitcoind and
-// to parse Bitcoin block data into Rosetta types.
+// Client is used to fetch blocks from lbrycrdd and
+// to parse lbry block data into Rosetta types.
 //
-// We opted not to use existing Bitcoin RPC libraries
+// We opted not to use existing lbry RPC libraries
 // because they don't allow providing context
 // in each request.
 type Client struct {
@@ -130,7 +130,7 @@ func LocalhostURL(rpcPort int) string {
 	return fmt.Sprintf("http://localhost:%d", rpcPort)
 }
 
-// NewClient creates a new Bitcoin client.
+// NewClient creates a new lbry client.
 func NewClient(
 	baseURL string,
 	genesisBlockIdentifier *types.BlockIdentifier,
@@ -161,7 +161,7 @@ func newHTTPClient(timeout time.Duration) *http.Client {
 }
 
 // NetworkStatus returns the *types.NetworkStatusResponse for
-// bitcoind.
+// lbrycrdd.
 func (b *Client) NetworkStatus(ctx context.Context) (*types.NetworkStatusResponse, error) {
 	rawBlock, err := b.getBlock(ctx, nil)
 	if err != nil {
@@ -240,7 +240,7 @@ func (b *Client) GetRawBlock(
 	return block, coins, nil
 }
 
-// ParseBlock returns a parsed bitcoin block given a raw bitcoin
+// ParseBlock returns a parsed lbry block given a raw lbry
 // block and a map of transactions containing inputs.
 func (b *Client) ParseBlock(
 	ctx context.Context,
@@ -263,7 +263,7 @@ func (b *Client) ParseBlock(
 }
 
 // SendRawTransaction submits a serialized transaction
-// to bitcoind.
+// to lbrycrdd.
 func (b *Client) SendRawTransaction(
 	ctx context.Context,
 	serializedTx string,
@@ -300,14 +300,14 @@ func (b *Client) SuggestedFeeRate(
 }
 
 // PruneBlockchain prunes up to the provided height.
-// https://bitcoincore.org/en/doc/0.20.0/rpc/blockchain/pruneblockchain
+// https://lbrycore.org/en/doc/0.20.0/rpc/blockchain/pruneblockchain
 func (b *Client) PruneBlockchain(
 	ctx context.Context,
 	height int64,
 ) (int64, error) {
 	// Parameters:
 	//   1. Height
-	// https://developer.bitcoin.org/reference/rpc/pruneblockchain.html#argument-1-height
+	// https://developer.lbry.org/reference/rpc/pruneblockchain.html#argument-1-height
 	params := []interface{}{height}
 
 	response := &pruneBlockchainResponse{}
@@ -361,7 +361,7 @@ func (b *Client) getBlock(
 	// Parameters:
 	//   1. Block hash (string, required)
 	//   2. Verbosity (integer, optional, default=1)
-	// https://bitcoin.org/en/developer-reference#getblock
+	// https://lbry.org/en/developer-reference#getblock
 	params := []interface{}{hash, blockVerbosity}
 
 	response := &blockResponse{}
@@ -447,14 +447,14 @@ func (b *Client) parseBlockData(block *Block) (*types.Block, error) {
 
 // getHashFromIndex performs the `getblockhash` JSON-RPC request for the specified
 // block index, and returns the hash.
-// https://bitcoin.org/en/developer-reference#getblockhash
+// https://lbry.org/en/developer-reference#getblockhash
 func (b *Client) getHashFromIndex(
 	ctx context.Context,
 	index int64,
 ) (string, error) {
 	// Parameters:
 	//   1. Block height (numeric, required)
-	// https://bitcoin.org/en/developer-reference#getblockhash
+	// https://lbry.org/en/developer-reference#getblockhash
 	params := []interface{}{index}
 
 	response := &blockHashResponse{}
@@ -471,9 +471,9 @@ func (b *Client) getHashFromIndex(
 
 // skipTransactionOperations is used to skip operations on transactions that
 // contain duplicate UTXOs (which are no longer possible after BIP-30). This
-// function mirrors the behavior of a similar commit in bitcoin-core.
+// function mirrors the behavior of a similar commit in lbry-core.
 //
-// Source: https://github.com/bitcoin/bitcoin/commit/ab91bf39b7c11e9c86bb2043c24f0f377f1cf514
+// Source: https://github.com/lbry/lbry/commit/ab91bf39b7c11e9c86bb2043c24f0f377f1cf514
 func skipTransactionOperations(blockNumber int64, blockHash string, transactionHash string) bool {
 	if blockNumber == 91842 && blockHash == "00000000000a4d0a398161ffc163c503763b1f4360639393e0e4c8e300e0caec" &&
 		transactionHash == "d5d27987d2a3dfc724e359870c6644b40e497bdc0589a033220fe15429d88599" {
@@ -494,7 +494,7 @@ func (b *Client) parseTransactions(
 	block *Block,
 	coins map[string]*types.AccountCoin,
 ) ([]*types.Transaction, error) {
-	logger := bitcoinUtils.ExtractLogger(ctx, "client")
+	logger := lbryUtils.ExtractLogger(ctx, "client")
 
 	if block == nil {
 		return nil, errors.New("error parsing nil block")
@@ -569,7 +569,7 @@ func (b *Client) parseTxOperations(
 	txOps := []*types.Operation{}
 
 	for networkIndex, input := range tx.Inputs {
-		if bitcoinIsCoinbaseInput(input, txIndex, networkIndex) {
+		if lbryIsCoinbaseInput(input, txIndex, networkIndex) {
 			txOp, err := b.coinbaseTxOperation(input, int64(len(txOps)), int64(networkIndex))
 			if err != nil {
 				return nil, err
@@ -579,7 +579,7 @@ func (b *Client) parseTxOperations(
 			break
 		}
 
-		// Fetch the *storage.AccountCoin the input is associated with
+		// Fetch the *types.AccountCoin the input is associated with
 		accountCoin, ok := coins[CoinIdentifier(input.TxHash, input.Vout)]
 		if !ok {
 			return nil, fmt.Errorf(
@@ -627,7 +627,7 @@ func (b *Client) parseTxOperations(
 }
 
 // parseOutputTransactionOperation returns the types.Operation for the specified
-// `bitcoinOutput` transaction output.
+// `lbryOutput` transaction output.
 func (b *Client) parseOutputTransactionOperation(
 	output *Output,
 	txHash string,
@@ -656,7 +656,7 @@ func (b *Client) parseOutputTransactionOperation(
 		CoinAction: types.CoinCreated,
 	}
 
-	// If we are unable to parse the output account (i.e. bitcoind
+	// If we are unable to parse the output account (i.e. lbrycrdd
 	// returns a blank/nonstandard ScriptPubKey), we create an address as the
 	// concatenation of the tx hash and index.
 	//
@@ -698,17 +698,17 @@ func (b *Client) getInputTxHash(
 	txIndex int,
 	inputIndex int,
 ) (string, int64, bool) {
-	if bitcoinIsCoinbaseInput(input, txIndex, inputIndex) {
+	if lbryIsCoinbaseInput(input, txIndex, inputIndex) {
 		return "", -1, false
 	}
 
 	return input.TxHash, input.Vout, true
 }
 
-// bitcoinIsCoinbaseInput returns whether the specified input is
+// lbryIsCoinbaseInput returns whether the specified input is
 // the coinbase input. The coinbase input is always the first input in the first
 // transaction, and does not contain a previous transaction hash.
-func bitcoinIsCoinbaseInput(input *Input, txIndex int, inputIndex int) bool {
+func lbryIsCoinbaseInput(input *Input, txIndex int, inputIndex int) bool {
 	return txIndex == 0 && inputIndex == 0 && input.TxHash == "" && input.Coinbase != ""
 }
 
@@ -767,7 +767,7 @@ func (b *Client) parseAmount(amount float64) (uint64, error) {
 	return uint64(atomicAmount), nil
 }
 
-// parseOutputAccount parses a bitcoinScriptPubKey and returns an account
+// parseOutputAccount parses a lbryScriptPubKey and returns an account
 // identifier. The account identifier's address corresponds to the first
 // address encoded in the script.
 func (b *Client) parseOutputAccount(
@@ -803,7 +803,7 @@ func (b *Client) coinbaseTxOperation(
 	}, nil
 }
 
-// post makes a HTTP request to a Bitcoin node
+// post makes a HTTP request to a lbry node
 func (b *Client) post(
 	ctx context.Context,
 	method requestMethod,

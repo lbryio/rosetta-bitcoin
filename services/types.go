@@ -17,15 +17,15 @@ package services
 import (
 	"context"
 
-	"github.com/coinbase/rosetta-bitcoin/bitcoin"
+	"github.com/lbryio/rosetta-lbry/lbry"
 
 	"github.com/coinbase/rosetta-sdk-go/types"
 )
 
 const (
 	// NodeVersion is the version of
-	// bitcoin core we are using.
-	NodeVersion = "0.20.1"
+	// lbry core we are using.
+	NodeVersion = "0.19.1.2"
 
 	// HistoricalBalanceLookup indicates
 	// that historical balance lookup is supported.
@@ -41,7 +41,7 @@ const (
 	inlineFetchLimit = 100
 
 	// MiddlewareVersion is the version
-	// of rosetta-bitcoin. We set this as a
+	// of rosetta-lbry. We set this as a
 	// variable instead of a constant because
 	// we typically need the pointer of this
 	// value.
@@ -75,7 +75,7 @@ type Indexer interface {
 	GetScriptPubKeys(
 		context.Context,
 		[]*types.Coin,
-	) ([]*bitcoin.ScriptPubKey, error)
+	) ([]*lbry.ScriptPubKey, error)
 	GetBalance(
 		context.Context,
 		*types.AccountIdentifier,
@@ -85,10 +85,10 @@ type Indexer interface {
 }
 
 type unsignedTransaction struct {
-	Transaction    string                  `json:"transaction"`
-	ScriptPubKeys  []*bitcoin.ScriptPubKey `json:"scriptPubKeys"`
-	InputAmounts   []string                `json:"input_amounts"`
-	InputAddresses []string                `json:"input_addresses"`
+	Transaction    string               `json:"transaction"`
+	ScriptPubKeys  []*lbry.ScriptPubKey `json:"scriptPubKeys"`
+	InputAmounts   []string             `json:"input_amounts"`
+	InputAddresses []string             `json:"input_addresses"`
 }
 
 type preprocessOptions struct {
@@ -98,7 +98,7 @@ type preprocessOptions struct {
 }
 
 type constructionMetadata struct {
-	ScriptPubKeys []*bitcoin.ScriptPubKey `json:"script_pub_keys"`
+	ScriptPubKeys []*lbry.ScriptPubKey `json:"script_pub_keys"`
 }
 
 type signedTransaction struct {
@@ -109,5 +109,5 @@ type signedTransaction struct {
 // ParseOperationMetadata is returned from
 // ConstructionParse.
 type ParseOperationMetadata struct {
-	ScriptPubKey *bitcoin.ScriptPubKey `json:"scriptPubKey"`
+	ScriptPubKey *lbry.ScriptPubKey `json:"scriptPubKey"`
 }
